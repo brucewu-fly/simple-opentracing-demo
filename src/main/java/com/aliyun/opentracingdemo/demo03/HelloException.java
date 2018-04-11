@@ -30,7 +30,6 @@ public class HelloException {
       span.finish();
     }
 
-    span.finish();
   }
 
   private static void func3(boolean invokeException) {
@@ -39,6 +38,30 @@ public class HelloException {
       if (invokeException) {
         throw new RuntimeException("func3 RuntimeException");
       }
+    }
+  }
+
+  private static void func4(boolean invokeException) {
+    try (Scope scope = TracerHolder.get().buildSpan("func4").startActive(false)) {
+      System.out.println("in func4");
+      if (invokeException) {
+        throw new RuntimeException("func4 RuntimeException");
+      }
+    }
+  }
+
+  private static void func5(boolean invokeException) {
+    Scope scope = TracerHolder.get().buildSpan("func5").startActive(true);
+
+    try {
+      System.out.println("in func5");
+      if (invokeException) {
+        throw new RuntimeException("func5 RuntimeException");
+      }
+    } catch (Throwable ex) {
+      scope.span().setTag("error", true);
+    } finally {
+      scope.close();
     }
   }
 
@@ -66,11 +89,29 @@ public class HelloException {
     }
   }
 
+  private static void handleFunc4() {
+    try {
+      func4(true);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  private static void handleFunc5() {
+    try {
+      func5(true);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
   public static void main(String[] args) {
     TracerManager.build();
     handleFunc1();
     handleFunc2();
     handleFunc3();
+    handleFunc4();
+    handleFunc5();
     TracerManager.close();
   }
 
