@@ -50,6 +50,8 @@ mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo03.HelloException
 * [Demo 3 - 异常处理](./src/main/java/com/aliyun/opentracingdemo/demo03)
   * 了解如果待追踪的方法在执行过程中抛出异常该如何处理
   * 不同创建 span 的方法在遇到未捕获异常时所表现出的行为
+* [Demo 4 - 异步回调](./src/main/java/com/aliyun/opentracingdemo/demo04)
+  * 了解在异步情况下如何结束一个 Span
 
 ## 其他资源
 [spring-boot-opentracing-demo](https://github.com/brucewu-fly/spring-boot-opentracing-demo)
