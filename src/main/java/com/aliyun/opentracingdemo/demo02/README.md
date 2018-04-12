@@ -57,7 +57,7 @@ private void printHello(Span rootSpan, String helloStr) {
 
 如果我们把 trace 想象成一个有向无环图（DAG），`asChildOf` 方法相当于在 span 和 rootSpan 之间创建了一条边。
 
-参阅 [HelloManual.java](./src/main/java/com/aliyun/opentracingdemo/demo02/HelloManual.java)
+参阅 [HelloManual.java](./HelloManual.java)
 
 
 ## 方式二 - 使用 scope
@@ -101,4 +101,4 @@ private void printHello(String helloStr) {
 
 这里推荐使用**方式二**。
 
-参阅 [HelloActive.java](https://github.com/brucewu-fly/simple-opentracing-demo/blob/master/src/main/java/com/aliyun/opentracingdemo/demo02/HelloActive.java)
+参阅 [HelloActive.java](./HelloActive.java)
