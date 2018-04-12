@@ -1,6 +1,6 @@
 package com.aliyun.opentracingdemo.demo03;
 
-import com.aliyun.opentracingdemo.TracerHolder;
+import com.aliyun.openservices.log.jaeger.sender.util.TracerHolder;
 import com.aliyun.opentracingdemo.TracerManager;
 import io.opentracing.Scope;
 import io.opentracing.Span;

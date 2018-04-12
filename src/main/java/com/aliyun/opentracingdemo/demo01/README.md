@@ -36,7 +36,7 @@ public static void build() {
 
 `TracerManager.build()` 方法会将创建好的 tracer 注册到 `TracerHolder` 中。您在程序的任意位置可以通过 `TracerHolder.get()` 获取 tracer 实例。
 
-参阅 [TracerHolder.java](../TracerHolder.java)
+参阅 [TracerHolder.java](https://github.com/aliyun/aliyun-log-jaeger-sender/blob/master/src/main/java/com/aliyun/openservices/log/jaeger/sender/util/TracerHolder.java)
 
 ## 使用步骤
 ```

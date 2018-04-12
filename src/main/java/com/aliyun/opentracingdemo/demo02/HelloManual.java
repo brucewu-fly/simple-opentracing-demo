@@ -1,6 +1,6 @@
 package com.aliyun.opentracingdemo.demo02;
 
-import com.aliyun.opentracingdemo.TracerHolder;
+import com.aliyun.openservices.log.jaeger.sender.util.TracerHolder;
 import com.aliyun.opentracingdemo.TracerManager;
 import com.google.common.collect.ImmutableMap;
 import io.opentracing.Span;

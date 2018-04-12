@@ -1,6 +1,7 @@
 package com.aliyun.opentracingdemo;
 
 import com.aliyun.openservices.log.jaeger.sender.AliyunLogSender;
+import com.aliyun.openservices.log.jaeger.sender.util.TracerHolder;
 import com.uber.jaeger.Tracer;
 import com.uber.jaeger.reporters.RemoteReporter;
 import com.uber.jaeger.samplers.ConstSampler;
