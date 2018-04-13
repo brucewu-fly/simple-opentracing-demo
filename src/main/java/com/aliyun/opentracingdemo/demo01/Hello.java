@@ -29,6 +29,8 @@ public class Hello {
     System.out.println(helloStr);
     span.log(ImmutableMap.of("event", "println"));
 
+    span.log("log_event");
+
     span.finish();
   }
 
