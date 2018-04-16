@@ -69,9 +69,10 @@ withSampler(new ConstSampler(false))
 
 **A**: 框架在构建 Span 的过程中，会调用 `sampler.sample(String operation, long id)` 方法构建出 SamplingStatus 对象来判断是否需要记录当前 trace。
 
-jaeger-client-java 提供了多种 Sampler 实现，包括 ConstSampler、GuaranteedThroughputSampler、PerOperationSampler、ProbabilisticSampler、RateLimitingSampler、RemoteControlledSampler。
+jaeger-client-java 提供了多种 Sampler 实现，包括 ConstSampler、GuaranteedThroughputSampler、PerOperationSampler、ProbabilisticSampler、RateLimitingSampler。
 
 * ConstSampler - 直接通过构造过程中传入的布尔参数来判断是否采样，逻辑非常简单，不影响性能。
+* 其余几种 Sampler 会有一些额外的判断逻辑，但逻辑也比较简单，不影响性能。
 
 **Q: 如何控制采样频率，如我只想记录 10% 的 trace？**
 
