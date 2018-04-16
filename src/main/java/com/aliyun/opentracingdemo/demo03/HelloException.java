@@ -1,14 +1,15 @@
 package com.aliyun.opentracingdemo.demo03;
 
-import com.aliyun.openservices.log.jaeger.sender.util.TracerHolder;
-import com.aliyun.opentracingdemo.TracerManager;
+import com.aliyun.openservices.log.jaeger.sender.AliyunLogSender;
+import com.aliyun.openservices.log.jaeger.sender.util.TracerHelper;
+import com.uber.jaeger.samplers.ConstSampler;
 import io.opentracing.Scope;
 import io.opentracing.Span;
 
 public class HelloException {
 
   private static void func1(boolean invokeException) {
-    Span span = TracerHolder.get().buildSpan("func1").start();
+    Span span = TracerHelper.buildSpan("func1").start();
 
     System.out.println("in func1");
     if (invokeException) {
@@ -19,7 +20,7 @@ public class HelloException {
   }
 
   private static void func2(boolean invokeException) {
-    Span span = TracerHolder.get().buildSpan("func2").start();
+    Span span = TracerHelper.buildSpan("func2").start();
 
     try {
       System.out.println("in func2");
@@ -33,7 +34,7 @@ public class HelloException {
   }
 
   private static void func3(boolean invokeException) {
-    try (Scope scope = TracerHolder.get().buildSpan("func3").startActive(true)) {
+    try (Scope scope = TracerHelper.buildSpan("func3").startActive(true)) {
       System.out.println("in func3");
       if (invokeException) {
         throw new RuntimeException("func3 RuntimeException");
@@ -42,7 +43,7 @@ public class HelloException {
   }
 
   private static void func4(boolean invokeException) {
-    try (Scope scope = TracerHolder.get().buildSpan("func4").startActive(false)) {
+    try (Scope scope = TracerHelper.buildSpan("func4").startActive(false)) {
       System.out.println("in func4");
       if (invokeException) {
         throw new RuntimeException("func4 RuntimeException");
@@ -51,12 +52,27 @@ public class HelloException {
   }
 
   private static void func5(boolean invokeException) {
-    Scope scope = TracerHolder.get().buildSpan("func5").startActive(true);
+    Scope scope = TracerHelper.buildSpan("func5").startActive(true);
 
     try {
       System.out.println("in func5");
       if (invokeException) {
         throw new RuntimeException("func5 RuntimeException");
+      }
+    } catch (Throwable ex) {
+      scope.span().setTag("error", true);
+    } finally {
+      scope.close();
+    }
+  }
+
+  private static void func6(boolean invokeException) {
+    Scope scope = TracerHelper.traceLatency("func6", true);
+
+    try {
+      System.out.println("in func6");
+      if (invokeException) {
+        throw new RuntimeException("func6 RuntimeException");
       }
     } catch (Throwable ex) {
       scope.span().setTag("error", true);
@@ -105,14 +121,34 @@ public class HelloException {
     }
   }
 
+  private static void handleFunc6() {
+    try {
+      func6(true);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  private static AliyunLogSender buildAliyunLogSender() {
+    String projectName = System.getenv("PROJECT");
+    String logStore = System.getenv("LOG_STORE");
+    String endpoint = System.getenv("ENDPOINT");
+    String accessKeyId = System.getenv("ACCESS_KEY_ID");
+    String accessKey = System.getenv("ACCESS_KEY_SECRET");
+    return new AliyunLogSender.Builder(projectName, logStore, endpoint, accessKeyId, accessKey)
+        .build();
+  }
+
   public static void main(String[] args) {
-    TracerManager.build();
+    TracerHelper
+        .buildTracer("simple-opentracing-demo", buildAliyunLogSender(), new ConstSampler(true));
     handleFunc1();
     handleFunc2();
     handleFunc3();
     handleFunc4();
     handleFunc5();
-    TracerManager.close();
+    handleFunc6();
+    TracerHelper.closeTracer();
   }
 
 }

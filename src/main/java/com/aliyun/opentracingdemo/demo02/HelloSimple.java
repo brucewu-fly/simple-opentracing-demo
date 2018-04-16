@@ -6,10 +6,10 @@ import com.google.common.collect.ImmutableMap;
 import com.uber.jaeger.samplers.ConstSampler;
 import io.opentracing.Scope;
 
-public class HelloActive {
+public class HelloSimple {
 
   private void sayHello(String helloTo) {
-    try (Scope scope = TracerHelper.buildSpan("say-hello").startActive(true)) {
+    try (Scope scope = TracerHelper.traceLatency("say-hello", true)) {
       scope.span().setTag("hello-to", helloTo);
 
       String helloStr = formatString(helloTo);
@@ -18,7 +18,7 @@ public class HelloActive {
   }
 
   private String formatString(String helloTo) {
-    try (Scope scope = TracerHelper.buildSpan("formatString").startActive(true)) {
+    try (Scope scope = TracerHelper.traceLatency("formatString", true)) {
       String helloStr = String.format("Hello, %s!", helloTo);
       scope.span().log(ImmutableMap.of("event", "string-format", "value", helloStr));
       return helloStr;
@@ -26,7 +26,7 @@ public class HelloActive {
   }
 
   private void printHello(String helloStr) {
-    try (Scope scope = TracerHelper.buildSpan("printHello").startActive(true)) {
+    try (Scope scope = TracerHelper.traceLatency("printHello", true)) {
       System.out.println(helloStr);
       scope.span().log(ImmutableMap.of("event", "println"));
     }
@@ -49,7 +49,8 @@ public class HelloActive {
     String helloTo = args[0];
     TracerHelper
         .buildTracer("simple-opentracing-demo", buildAliyunLogSender(), new ConstSampler(true));
-    new HelloActive().sayHello(helloTo);
+    new HelloSimple().sayHello(helloTo);
     TracerHelper.closeTracer();
   }
+
 }

@@ -1,26 +1,16 @@
 package com.aliyun.opentracingdemo.demo01;
 
-import com.aliyun.openservices.log.jaeger.sender.util.TracerHolder;
-import com.aliyun.opentracingdemo.TracerManager;
+import com.aliyun.openservices.log.jaeger.sender.AliyunLogSender;
+import com.aliyun.openservices.log.jaeger.sender.util.TracerHelper;
 import com.google.common.collect.ImmutableMap;
 
+import com.uber.jaeger.samplers.ConstSampler;
 import io.opentracing.Span;
-import io.opentracing.Tracer;
 
 public class Hello {
 
-  private Tracer tracer;
-
-  public Hello() {
-    this(TracerHolder.get());
-  }
-
-  public Hello(Tracer tracer) {
-    this.tracer = tracer;
-  }
-
   private void sayHello(String helloTo) {
-    Span span = tracer.buildSpan("say-hello").start();
+    Span span = TracerHelper.buildSpan("say-hello").start();
     span.setTag("hello-to", helloTo);
 
     String helloStr = String.format("Hello, %s!", helloTo);
@@ -34,14 +24,25 @@ public class Hello {
     span.finish();
   }
 
+  private static AliyunLogSender buildAliyunLogSender() {
+    String projectName = System.getenv("PROJECT");
+    String logStore = System.getenv("LOG_STORE");
+    String endpoint = System.getenv("ENDPOINT");
+    String accessKeyId = System.getenv("ACCESS_KEY_ID");
+    String accessKey = System.getenv("ACCESS_KEY_SECRET");
+    return new AliyunLogSender.Builder(projectName, logStore, endpoint, accessKeyId, accessKey)
+        .build();
+  }
+
   public static void main(String[] args) {
     if (args.length != 1) {
       throw new IllegalArgumentException("Expecting one argument");
     }
     String helloTo = args[0];
-    TracerManager.build();
+    TracerHelper
+        .buildTracer("simple-opentracing-demo", buildAliyunLogSender(), new ConstSampler(true));
     new Hello().sayHello(helloTo);
-    TracerManager.close();
+    TracerHelper.closeTracer();
   }
 
 }

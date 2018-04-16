@@ -8,12 +8,12 @@ import io.opentracing.Scope;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class HelloAsync {
+public class HelloAsyncSimple {
 
   private static ExecutorService executorService = Executors.newFixedThreadPool(1);
 
   private void sayHello(String helloTo) {
-    final Scope scope = TracerHelper.buildSpan("sayHello").startActive(false);
+    final Scope scope = TracerHelper.traceLatency("sayHello", false);
 
     String helloStr = String.format("Hello, %s!", helloTo);
     scope.span().log(ImmutableMap.of("event", "string-format", "value", helloStr));
@@ -24,7 +24,7 @@ public class HelloAsync {
     executorService.submit(new Runnable() {
       @Override
       public void run() {
-        try (Scope asyncScope = TracerHelper.scopeManager().activate(scope.span(), true)) {
+        try (Scope asyncScope = TracerHelper.asyncTraceLatency(scope, true)) {
           asyncScope.span().setTag("async", true);
           try {
             Thread.sleep(1000 * 2);
@@ -55,7 +55,7 @@ public class HelloAsync {
 
     TracerHelper
         .buildTracer("simple-opentracing-demo", buildAliyunLogSender(), new ConstSampler(true));
-    new HelloAsync().sayHello(helloTo);
+    new HelloAsyncSimple().sayHello(helloTo);
     try {
       Thread.sleep(1000 * 3);
     } catch (InterruptedException e) {
