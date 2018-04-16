@@ -18,14 +18,14 @@ private static AliyunLogSender buildAliyunLogSender() {
 }
 
 public static void build() {
-	AliyunLogSender aliyunLogSender = buildAliyunLogSender();
-	RemoteReporter remoteReporter = new RemoteReporter.Builder()
-	    .withSender(aliyunLogSender)
-	    .build();
-	TracerHolder.register(new Tracer.Builder("simple-opentracing-demo")
-	    .withReporter(remoteReporter)
-	    .withSampler(new ConstSampler(true))
-	    .build());
+    AliyunLogSender aliyunLogSender = buildAliyunLogSender();
+    RemoteReporter remoteReporter = new RemoteReporter.Builder()
+        .withSender(aliyunLogSender)
+        .build();
+    TracerHolder.register(new Tracer.Builder("simple-opentracing-demo")
+        .withReporter(remoteReporter)
+        .withSampler(new ConstSampler(true))
+        .build());
 }
 ```
 
