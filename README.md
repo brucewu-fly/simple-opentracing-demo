@@ -73,8 +73,13 @@ jaeger-client-java 提供了多种 Sampler 实现，包括 ConstSampler、Guaran
 
 * ConstSampler - 直接通过构造过程中传入的布尔参数来判断是否采样，逻辑非常简单，不影响性能。
 
-**Q: 如何控制采样频率？**
+**Q: 如何控制采样频率，如我只想记录 10% 的 trace？**
 
+**A**: 在您构造 Tracer 实例的时候，传入一个 ProbabilisticSampler 对象，设置参数 samplingRate 为您希望的采样频率。处于计算效率的考虑 ProbabilisticSampler 控制的是一个近似值，不是一个精确值。
+```
+// 只记录大约 10% 的 trace
+withSampler(new ProbabilisticSampler(0.1))
+```
 
 ## 其他资源
 [spring-boot-opentracing-demo](https://github.com/brucewu-fly/spring-boot-opentracing-demo)
