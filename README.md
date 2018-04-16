@@ -53,5 +53,28 @@ mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo03.HelloException
 * [Demo 4 - 异步回调](./src/main/java/com/aliyun/opentracingdemo/demo04)
   * 了解在异步情况下如何结束一个 Span
 
+## 常见问题
+**Q: 如何打开或关闭 trace 功能？**
+
+**A**: 在您构造 Tracer 实例的时候，传入一个 ConstSampler 对象。当 ConstSampler 的布尔参数 decision 被设置成 true 时，框架会记录每一条 trace；反之，框架不会记录任何一条 trace。
+```
+// 框架会记录每一条 trace
+withSampler(new ConstSampler(true))
+
+// 框架不会记录任何一条 trace
+withSampler(new ConstSampler(false))
+```
+
+**Q: 框架中判断是否记录 trace 的逻辑复杂吗，是否会影响程序性能？**
+
+**A**: 框架在构建 Span 的过程中，会调用 `sampler.sample(String operation, long id)` 方法构建出 SamplingStatus 对象来判断是否需要记录当前 trace。
+
+jaeger-client-java 提供了多种 Sampler 实现，包括 ConstSampler、GuaranteedThroughputSampler、PerOperationSampler、ProbabilisticSampler、RateLimitingSampler、RemoteControlledSampler。
+
+* ConstSampler - 直接通过构造过程中传入的布尔参数来判断是否采样，逻辑非常简单，不影响性能。
+
+**Q: 如何控制采样频率？**
+
+
 ## 其他资源
 [spring-boot-opentracing-demo](https://github.com/brucewu-fly/spring-boot-opentracing-demo)
