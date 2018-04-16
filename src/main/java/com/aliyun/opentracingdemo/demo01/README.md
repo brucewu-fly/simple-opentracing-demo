@@ -52,18 +52,17 @@ TracerManager.close();
 
 ```
 private void sayHello(String helloTo) {
-	Span span = tracer.buildSpan("say-hello").start();
-	span.setTag("hello-to", helloTo);
+    Span span = tracer.buildSpan("say-hello").start();
+    span.setTag("hello-to", helloTo);
 
-	String helloStr = String.format("Hello, %s!", helloTo);
-	span.log(ImmutableMap.of("event", "string-format", "value", helloStr));
+    String helloStr = String.format("Hello, %s!", helloTo);
+    span.log(ImmutableMap.of("event", "string-format", "value", helloStr));
 
-	System.out.println(helloStr);
-	span.log(ImmutableMap.of("event", "println"));
+    System.out.println(helloStr); 
+    span.log(ImmutableMap.of("event", "println"));
+    span.log("log_event");
 
-  span.log("log_event");
-
-	span.finish();
+    span.finish();
 }
 ```
 业务逻辑
