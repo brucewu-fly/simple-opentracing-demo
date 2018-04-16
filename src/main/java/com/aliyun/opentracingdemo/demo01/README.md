@@ -5,36 +5,6 @@
 * 如何创建一个简单的 trace
 
 ## TracerHelper
-`aliyun-log-jaeger-sender` 提供了一个工具类 `com.aliyun.openservices.log.jaeger.sender.util.TracerHelper` 用来全局保存 tracer。
-
-
-可以参考 TracerBuilder 的 `build()` 方法创建一个 tracer。
-```
-private static AliyunLogSender buildAliyunLogSender() {
-    String projectName = System.getenv("PROJECT");
-    String logStore = System.getenv("LOG_STORE");
-    String endpoint = System.getenv("ENDPOINT");
-    String accessKeyId = System.getenv("ACCESS_KEY_ID");
-    String accessKey = System.getenv("ACCESS_KEY_SECRET");
-    return new AliyunLogSender.Builder(projectName, logStore, endpoint, accessKeyId, accessKey)
-        .build();
-}
-
-public static void build() {
-    AliyunLogSender aliyunLogSender = buildAliyunLogSender();
-    RemoteReporter remoteReporter = new RemoteReporter.Builder()
-        .withSender(aliyunLogSender)
-        .build();
-    TracerHolder.register(new Tracer.Builder("simple-opentracing-demo")
-        .withReporter(remoteReporter)
-        .withSampler(new ConstSampler(true))
-        .build());
-}
-```
-
-参阅 [TracerManager.java](../TracerManager.java)
-
-## TracerHelper
 `aliyun-log-jaeger-sender` 提供了一个工具类 `com.aliyun.openservices.log.jaeger.sender.util.TracerHelper` 用来全局保存 tracer。之后您在程序的任意位置可以通过 `TracerHelper.buildSpan()` 方法创建 span 或者通过 `TracerHelper.traceLatency()` 开启追踪。
 
 ### 创建 tracer
