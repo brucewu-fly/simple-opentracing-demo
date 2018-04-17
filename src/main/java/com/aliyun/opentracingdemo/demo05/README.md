@@ -47,6 +47,8 @@ mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo05.Hello" -Dexec.
 
 ## 跨进程传递
 
+主要通过 inject 方法将 spanContext 注入到传输协议，然后通过 extract 方法从传输协议中抽取 spanContext。详细流程如下。
+
 ### sayHello
 `Hello` 中的方法 `sayHello` 作为程序的入口通过调用 TracerHelper.traceLatency() 方法创建 root span。
 ```
