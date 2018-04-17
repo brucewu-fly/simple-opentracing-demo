@@ -31,6 +31,13 @@ ACCESS_KEY_SECRET=<your_access_key_secret> \
 LOG_STORE=<your_log_store> && \
 mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo02.HelloActive" -Dexec.args="world"
 
+export PROJECT=<your_project> \
+ENDPOINT=<your_endpoint> \
+ACCESS_KEY_ID=<your_access_key_id> \
+ACCESS_KEY_SECRET=<your_access_key_secret> \
+LOG_STORE=<your_log_store> && \
+mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo02.HelloSimple" -Dexec.args="world"
+
 ## 运行 demo03
 export PROJECT=<your_project> \
 ENDPOINT=<your_endpoint> \
@@ -38,6 +45,21 @@ ACCESS_KEY_ID=<your_access_key_id> \
 ACCESS_KEY_SECRET=<your_access_key_secret> \
 LOG_STORE=<your_log_store> && \
 mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo03.HelloException"
+
+## 运行 demo04
+export PROJECT=<your_project> \
+ENDPOINT=<your_endpoint> \
+ACCESS_KEY_ID=<your_access_key_id> \
+ACCESS_KEY_SECRET=<your_access_key_secret> \
+LOG_STORE=<your_log_store> && \
+mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo04.HelloAsync" -Dexec.args="world"
+
+export PROJECT=<your_project> \
+ENDPOINT=<your_endpoint> \
+ACCESS_KEY_ID=<your_access_key_id> \
+ACCESS_KEY_SECRET=<your_access_key_secret> \
+LOG_STORE=<your_log_store> && \
+mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo04.HelloAsyncSimple" -Dexec.args="world"
 ```
 
 ## 样例
