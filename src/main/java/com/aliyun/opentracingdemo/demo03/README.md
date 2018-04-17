@@ -20,7 +20,7 @@ private static void func(boolean invokeException) {
 Span 的 `finish()` 方法不会被调用，该 span 不会被记录。
 ```
 private static void func1(boolean invokeException) {
-	Span span = TracerHolder.get().buildSpan("func1").start();
+	Span span = TracerHelper.buildSpan("func1").start();
 
 	System.out.println("in func1");
 	if (invokeException) {
@@ -35,7 +35,7 @@ private static void func1(boolean invokeException) {
 Span 的 `finish()` 方法在 finally 中被调用，该 span 会被记录。
 ```
 private static void func2(boolean invokeException) {
-	Span span = TracerHolder.get().buildSpan("func2").start();
+	Span span = TracerHelper.buildSpan("func2").start();
 
 	try {
 		System.out.println("in func2");
@@ -53,7 +53,7 @@ private static void func2(boolean invokeException) {
 Span 的 `finish()` 方法在当前 Scope 被自动 close 时调用，该 span 会被记录。
 ```
 private static void func3(boolean invokeException) {
-	try (Scope scope = TracerHolder.get().buildSpan("func3").startActive(true)) {
+	try (Scope scope =TracerHelper.buildSpan("func3").startActive(true)) {
 		System.out.println("in func3");
 		if (invokeException) {
 			throw new RuntimeException("func3 RuntimeException");
@@ -66,7 +66,7 @@ private static void func3(boolean invokeException) {
 由于 startActive 的布尔参数被设成了 false，因此当前 Scope 被自动 close 时，不会调用 span 的 finish 方法，该 span 不会被记录。
 ```
 private static void func4(boolean invokeException) {
-	try (Scope scope = TracerHolder.get().buildSpan("func4").startActive(false)) {
+	try (Scope scope = TracerHelper.buildSpan("func4").startActive(false)) {
 		System.out.println("in func4");
 		if (invokeException) {
 			throw new RuntimeException("func4 RuntimeException");
@@ -79,7 +79,7 @@ private static void func4(boolean invokeException) {
 对抛出地异常进行捕获，并为 span 增加一些 tag。该 span 会被记录，并且包含 error: true 这个 tag。
 ```
 private static void func5(boolean invokeException) {
-	Scope scope = TracerHolder.get().buildSpan("func5").startActive(true);
+	Scope scope = TracerHelper.buildSpan("func5").startActive(true);
 
 	try {
 		System.out.println("in func5");
@@ -91,5 +91,23 @@ private static void func5(boolean invokeException) {
 	} finally {
 	  	scope.close();
 	}
+}
+```
+
+## 方式六
+```
+private static void func6(boolean invokeException) {
+  Scope scope = TracerHelper.traceLatency("func6", true);
+
+  try {
+    System.out.println("in func6");
+    if (invokeException) {
+      throw new RuntimeException("func6 RuntimeException");
+    }
+  } catch (Throwable ex) {
+    scope.span().setTag("error", true);
+  } finally {
+    scope.close();
+  }
 }
 ```

@@ -20,7 +20,7 @@
 `sayHello` 中创建 span，并显示传递给 `formatString` 和 `printHello`。
 ```
 private void sayHello(String helloTo) {
-  Span span = TracerHolder.get().buildSpan("say-hello").start();
+  Span span = TracerHelper.buildSpan("say-hello").start();
 
   span.setTag("hello-to", helloTo);
 
@@ -34,7 +34,7 @@ private void sayHello(String helloTo) {
 `formatString` 和 `printHello` 在创建 span 的时候通过 `asChildOf` 方法指定父 span。
 ```
 private String formatString(Span rootSpan, String helloTo) {
-  Span span = TracerHolder.get().buildSpan("formatString").asChildOf(rootSpan).start();
+  Span span = TracerHelper.buildSpan("formatString").asChildOf(rootSpan).start();
   try {
     String helloStr = String.format("Hello, %s!", helloTo);
     span.log(ImmutableMap.of("event", "string-format", "value", helloStr));
@@ -45,7 +45,7 @@ private String formatString(Span rootSpan, String helloTo) {
 }
 
 private void printHello(Span rootSpan, String helloStr) {
-  Span span = TracerHolder.get().buildSpan("printHello").asChildOf(rootSpan).start();
+  Span span = TracerHelper.buildSpan("printHello").asChildOf(rootSpan).start();
   try {
     System.out.println(helloStr);
     span.log(ImmutableMap.of("event", "println"));
@@ -69,7 +69,7 @@ private void printHello(Span rootSpan, String helloStr) {
 **OpenTracing API for Java** 提供了一个更优雅地方式。
 ```
 private void sayHello(String helloTo) {
-  try (Scope scope = TracerHolder.get().buildSpan("say-hello").startActive(true)) {
+  try (Scope scope = TracerHelper.buildSpan("say-hello").startActive(true)) {
     scope.span().setTag("hello-to", helloTo);
 
     String helloStr = formatString(helloTo);
@@ -78,7 +78,7 @@ private void sayHello(String helloTo) {
 }
 
 private String formatString(String helloTo) {
-  try (Scope scope = TracerHolder.get().buildSpan("formatString").startActive(true)) {
+  try (Scope scope = TracerHelper.buildSpan("formatString").startActive(true)) {
     String helloStr = String.format("Hello, %s!", helloTo);
     scope.span().log(ImmutableMap.of("event", "string-format", "value", helloStr));
     return helloStr;
@@ -86,7 +86,7 @@ private String formatString(String helloTo) {
 }
 
 private void printHello(String helloStr) {
-  try (Scope scope = TracerHolder.get().buildSpan("printHello").startActive(true)) {
+  try (Scope scope = TracerHelper.buildSpan("printHello").startActive(true)) {
     System.out.println(helloStr);
     scope.span().log(ImmutableMap.of("event", "println"));
   }
@@ -99,6 +99,33 @@ private void printHello(String helloStr) {
 * 这里将 `startActive(true)` 方法的布尔参数 finishSpanOnClose 设为 true，会让 Scope 在关闭时调用 span 的 `finish()` 方法自动结束一个 span。
 * `startActive()` 方法会自动地将当前 span 设为前一个活跃 span 的子 span，因此这里我们不需要显示地调用 `asChildOf()` 方法了。
 
-这里推荐使用**方式二**。
-
 参阅 [HelloActive.java](./HelloActive.java)
+
+## 方式三 - 使用 traceLatency() 方法
+直接使用 scope 还是有些繁琐，为此 TracerHelper 提供了 `traceLatency()` 方法简化 scope 的创建过程。
+```
+private void sayHello(String helloTo) {
+  try (Scope scope = TracerHelper.traceLatency("say-hello", true)) {
+    scope.span().setTag("hello-to", helloTo);
+
+    String helloStr = formatString(helloTo);
+    printHello(helloStr);
+  }
+}
+
+private String formatString(String helloTo) {
+  try (Scope scope = TracerHelper.traceLatency("formatString", true)) {
+    String helloStr = String.format("Hello, %s!", helloTo);
+    scope.span().log(ImmutableMap.of("event", "string-format", "value", helloStr));
+    return helloStr;
+  }
+}
+
+private void printHello(String helloStr) {
+  try (Scope scope = TracerHelper.traceLatency("printHello", true)) {
+    System.out.println(helloStr);
+    scope.span().log(ImmutableMap.of("event", "println"));
+  }
+}
+```
+参阅 [HelloSimple.java](./HelloSimple.java)
