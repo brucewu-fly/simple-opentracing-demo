@@ -52,6 +52,9 @@ mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo03.HelloException
   * 不同创建 span 的方法在遇到未捕获异常时所表现出的行为
 * [Demo 4 - 异步回调](./src/main/java/com/aliyun/opentracingdemo/demo04)
   * 了解在异步情况下如何结束一个 Span
+* [Demo 5 - 跨进程追踪](./src/main/java/com/aliyun/opentracingdemo/demo05)
+  * 了解如何追踪一个跨进程调用
+  * 使用 `Inject` 和 `Extract` 传递 context
 
 ## 常见问题
 **Q: 如何打开或关闭 trace 功能？**
