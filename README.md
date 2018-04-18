@@ -76,7 +76,7 @@ mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo04.HelloAsyncSimp
   * 了解在异步情况下如何结束一个 Span
 * [Demo 5 - 跨进程追踪](./src/main/java/com/aliyun/opentracingdemo/demo05)
   * 了解如何追踪一个跨进程调用
-  * 使用 `Inject` 和 `Extract` 传递 context
+  * 如何跨进程传递 SpanContext
 
 ## 常见问题
 **Q: 如何打开或关闭 trace 功能？**
