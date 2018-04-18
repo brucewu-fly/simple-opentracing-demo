@@ -26,7 +26,7 @@ public class Publisher extends Application<Configuration> {
   public class PublisherResource {
 
     @GET
-    public String format(@QueryParam("helloStr") String helloStr,
+    public String publish(@QueryParam("helloStr") String helloStr,
         @Context HttpHeaders httpHeaders) {
       MultivaluedMap<String, String> rawHeaders = httpHeaders.getRequestHeaders();
       String spanContextStr = rawHeaders.get("trace-id").get(0);
@@ -34,17 +34,17 @@ public class Publisher extends Application<Configuration> {
       if (rawHeaders.get("trace-id") != null) {
         String spanContextString = rawHeaders.get("trace-id").get(0);
         try (Scope scope = TracerHelper.traceLatency("publish", spanContextString)) {
-          return doFormat(helloStr, scope);
+          return doPublish(helloStr, scope);
         }
       } else {
         try (Scope scope = TracerHelper.traceLatency("publish")) {
-          return doFormat(helloStr, scope);
+          return doPublish(helloStr, scope);
         }
       }
     }
   }
 
-  private String doFormat(String helloStr, Scope scope) {
+  private String doPublish(String helloStr, Scope scope) {
     System.out.println(helloStr);
     scope.span().log(ImmutableMap.of("event", "println", "value", helloStr));
     return "published";
