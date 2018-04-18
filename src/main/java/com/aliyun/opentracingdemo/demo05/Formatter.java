@@ -30,11 +30,11 @@ public class Formatter extends Application<Configuration> {
       MultivaluedMap<String, String> rawHeaders = httpHeaders.getRequestHeaders();
       if (rawHeaders.get("trace-id") != null) {
         String spanContextString = rawHeaders.get("trace-id").get(0);
-        try (Scope scope = TracerHelper.traceLatency("format", true, spanContextString)) {
+        try (Scope scope = TracerHelper.traceLatency("format", spanContextString)) {
           return doFormat(helloTo, scope);
         }
       } else {
-        try (Scope scope = TracerHelper.traceLatency("format", true)) {
+        try (Scope scope = TracerHelper.traceLatency("format")) {
           return doFormat(helloTo, scope);
         }
       }

@@ -27,6 +27,8 @@ String spanContextString = TracerHelper.getActiveSpanContextString();
 requestBuilder.addHeader("trace-id", spanContextString);
 ```
 
+参阅 [Hello.java](./Hello.java#L30)
+
 ### 服务端
 将 spanContextString 从网络协议的字段中提取出来，如 HTTP Header，然后通过 `TracerHelper.traceLatency(String operationName, boolean finishSpanOnClose, String spanContextString)` 方法创建 scope。
 ```
@@ -35,6 +37,8 @@ try (Scope scope = TracerHelper.traceLatency("format", true, spanContextString))
   ...
 }
 ```
+
+参阅 [Formatter.java](./Formatter.java#L32)
 
 ## 运行
 ### Formatter

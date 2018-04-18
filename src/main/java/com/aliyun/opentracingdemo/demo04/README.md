@@ -42,7 +42,13 @@ private void sayHello(String helloTo) {
 通过 TracerHelper 的 traceLatency() 方法和 asyncTraceLatency() 方法简化代码。
 ```
 private void sayHello(String helloTo) {
-  final Scope scope = TracerHelper.traceLatency("sayHello", false);
+  final Scope scope = TracerHelper.asyncTraceLatency("sayHello");
+
+  try {
+    Thread.sleep(1000);
+  } catch (InterruptedException e) {
+    e.printStackTrace();
+  }
 
   String helloStr = String.format("Hello, %s!", helloTo);
   scope.span().log(ImmutableMap.of("event", "string-format", "value", helloStr));
@@ -53,7 +59,7 @@ private void sayHello(String helloTo) {
   executorService.submit(new Runnable() {
     @Override
     public void run() {
-      try (Scope asyncScope = TracerHelper.asyncTraceLatency(scope, true)) {
+      try (Scope asyncScope = TracerHelper.restoreAsyncTraceLatency(scope)) {
         asyncScope.span().setTag("async", true);
         try {
           Thread.sleep(1000 * 2);

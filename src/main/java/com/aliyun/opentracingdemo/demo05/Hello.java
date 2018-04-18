@@ -42,7 +42,7 @@ public class Hello {
   }
 
   private void sayHello(String helloTo) {
-    try (Scope scope = TracerHelper.traceLatency("say-hello", true)) {
+    try (Scope scope = TracerHelper.traceLatency("say-hello")) {
       scope.span().setTag("hello-to", helloTo);
 
       String helloStr = formatString(helloTo);
@@ -51,7 +51,7 @@ public class Hello {
   }
 
   private String formatString(String helloTo) {
-    try (Scope scope = TracerHelper.traceLatency("formatString", true)) {
+    try (Scope scope = TracerHelper.traceLatency("formatString")) {
       String helloStr = getHttp(8081, "format", "helloTo", helloTo);
       scope.span().log(ImmutableMap.of("event", "string-format", "value", helloStr));
       return helloStr;
@@ -59,7 +59,7 @@ public class Hello {
   }
 
   private void printHello(String helloStr) {
-    try (Scope scope = TracerHelper.traceLatency("printHello", true)) {
+    try (Scope scope = TracerHelper.traceLatency("printHello")) {
       getHttp(8082, "publish", "helloStr", helloStr);
       scope.span().log(ImmutableMap.of("event", "println"));
     }

@@ -105,7 +105,7 @@ private void printHello(String helloStr) {
 直接使用 scope 还是有些繁琐，为此 TracerHelper 提供了 `traceLatency()` 方法简化 scope 的创建过程。
 ```
 private void sayHello(String helloTo) {
-  try (Scope scope = TracerHelper.traceLatency("say-hello", true)) {
+  try (Scope scope = TracerHelper.traceLatency("say-hello")) {
     scope.span().setTag("hello-to", helloTo);
 
     String helloStr = formatString(helloTo);
@@ -114,7 +114,7 @@ private void sayHello(String helloTo) {
 }
 
 private String formatString(String helloTo) {
-  try (Scope scope = TracerHelper.traceLatency("formatString", true)) {
+  try (Scope scope = TracerHelper.traceLatency("formatString")) {
     String helloStr = String.format("Hello, %s!", helloTo);
     scope.span().log(ImmutableMap.of("event", "string-format", "value", helloStr));
     return helloStr;
@@ -122,7 +122,7 @@ private String formatString(String helloTo) {
 }
 
 private void printHello(String helloStr) {
-  try (Scope scope = TracerHelper.traceLatency("printHello", true)) {
+  try (Scope scope = TracerHelper.traceLatency("printHello")) {
     System.out.println(helloStr);
     scope.span().log(ImmutableMap.of("event", "println"));
   }

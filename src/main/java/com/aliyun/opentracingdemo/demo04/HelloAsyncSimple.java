@@ -13,7 +13,7 @@ public class HelloAsyncSimple {
   private static ExecutorService executorService = Executors.newFixedThreadPool(1);
 
   private void sayHello(String helloTo) {
-    final Scope scope = TracerHelper.traceLatency("sayHello", false);
+    final Scope scope = TracerHelper.asyncTraceLatency("sayHello");
 
     try {
       Thread.sleep(1000);
@@ -30,7 +30,7 @@ public class HelloAsyncSimple {
     executorService.submit(new Runnable() {
       @Override
       public void run() {
-        try (Scope asyncScope = TracerHelper.asyncTraceLatency(scope, true)) {
+        try (Scope asyncScope = TracerHelper.restoreAsyncTraceLatency(scope)) {
           asyncScope.span().setTag("async", true);
           try {
             Thread.sleep(1000 * 2);

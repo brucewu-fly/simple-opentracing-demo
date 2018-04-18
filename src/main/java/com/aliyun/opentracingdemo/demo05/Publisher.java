@@ -33,11 +33,11 @@ public class Publisher extends Application<Configuration> {
       System.out.println(spanContextStr);
       if (rawHeaders.get("trace-id") != null) {
         String spanContextString = rawHeaders.get("trace-id").get(0);
-        try (Scope scope = TracerHelper.traceLatency("publish", true, spanContextString)) {
+        try (Scope scope = TracerHelper.traceLatency("publish", spanContextString)) {
           return doFormat(helloStr, scope);
         }
       } else {
-        try (Scope scope = TracerHelper.traceLatency("publish", true)) {
+        try (Scope scope = TracerHelper.traceLatency("publish")) {
           return doFormat(helloStr, scope);
         }
       }

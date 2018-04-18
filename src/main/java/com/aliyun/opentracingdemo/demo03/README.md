@@ -97,7 +97,7 @@ private static void func5(boolean invokeException) {
 ## 方式六
 ```
 private static void func6(boolean invokeException) {
-  Scope scope = TracerHelper.traceLatency("func6", true);
+  Scope scope = TracerHelper.traceLatency("func6");
 
   try {
     System.out.println("in func6");
