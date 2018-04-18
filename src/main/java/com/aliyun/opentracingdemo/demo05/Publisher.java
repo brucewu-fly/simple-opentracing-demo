@@ -2,7 +2,6 @@ package com.aliyun.opentracingdemo.demo05;
 
 import com.aliyun.openservices.log.jaeger.sender.AliyunLogSender;
 import com.aliyun.openservices.log.jaeger.sender.util.TracerHelper;
-import com.aliyun.opentracingdemo.util.Tracing;
 import com.google.common.collect.ImmutableMap;
 
 import com.uber.jaeger.samplers.ConstSampler;
@@ -18,6 +17,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 public class Publisher extends Application<Configuration> {
 
@@ -26,13 +26,28 @@ public class Publisher extends Application<Configuration> {
   public class PublisherResource {
 
     @GET
-    public String format(@QueryParam("helloStr") String helloStr, @Context HttpHeaders httpHeaders) {
-      try (Scope scope = Tracing.startServerSpan(httpHeaders, "publish")) {
-        System.out.println(helloStr);
-        scope.span().log(ImmutableMap.of("event", "println", "value", helloStr));
-        return "published";
+    public String format(@QueryParam("helloStr") String helloStr,
+        @Context HttpHeaders httpHeaders) {
+      MultivaluedMap<String, String> rawHeaders = httpHeaders.getRequestHeaders();
+      String spanContextStr = rawHeaders.get("trace-id").get(0);
+      System.out.println(spanContextStr);
+      if (rawHeaders.get("trace-id") != null) {
+        String spanContextString = rawHeaders.get("trace-id").get(0);
+        try (Scope scope = TracerHelper.traceLatency("publish", true, spanContextString)) {
+          return doFormat(helloStr, scope);
+        }
+      } else {
+        try (Scope scope = TracerHelper.traceLatency("publish", true)) {
+          return doFormat(helloStr, scope);
+        }
       }
     }
+  }
+
+  private String doFormat(String helloStr, Scope scope) {
+    System.out.println(helloStr);
+    scope.span().log(ImmutableMap.of("event", "println", "value", helloStr));
+    return "published";
   }
 
   @Override

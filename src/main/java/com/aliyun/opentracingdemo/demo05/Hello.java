@@ -5,11 +5,8 @@ import com.aliyun.openservices.log.jaeger.sender.util.TracerHelper;
 import com.google.common.collect.ImmutableMap;
 import com.uber.jaeger.samplers.ConstSampler;
 import io.opentracing.Scope;
-import io.opentracing.propagation.Format.Builtin;
-import io.opentracing.tag.Tags;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map.Entry;
+
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -23,26 +20,6 @@ public class Hello {
     this.client = new OkHttpClient();
   }
 
-  private static class RequestBuilderCarrier implements io.opentracing.propagation.TextMap {
-
-    private final Request.Builder builder;
-
-    RequestBuilderCarrier(Request.Builder builder) {
-      this.builder = builder;
-    }
-
-    @Override
-    public Iterator<Entry<String, String>> iterator() {
-      throw new UnsupportedOperationException("carrier is write-only");
-    }
-
-    @Override
-    public void put(String key, String value) {
-      builder.addHeader(key, value);
-    }
-
-  }
-
   private String getHttp(int port, String path, String param, String value) {
     try {
       HttpUrl url = new HttpUrl.Builder().scheme("http").host("localhost").port(port)
@@ -50,11 +27,8 @@ public class Hello {
           .addQueryParameter(param, value).build();
       Request.Builder requestBuilder = new Request.Builder().url(url);
 
-      Tags.SPAN_KIND.set(TracerHelper.activeSpan(), Tags.SPAN_KIND_CLIENT);
-      Tags.HTTP_METHOD.set(TracerHelper.activeSpan(), "GET");
-      Tags.HTTP_URL.set(TracerHelper.activeSpan(), url.toString());
-      TracerHelper.inject(TracerHelper.activeSpan().context(), Builtin.HTTP_HEADERS,
-          new RequestBuilderCarrier(requestBuilder));
+      String spanContextString = TracerHelper.getActiveSpanContextString();
+      requestBuilder.addHeader("trace-id", spanContextString);
 
       Request request = requestBuilder.build();
       Response response = client.newCall(request).execute();

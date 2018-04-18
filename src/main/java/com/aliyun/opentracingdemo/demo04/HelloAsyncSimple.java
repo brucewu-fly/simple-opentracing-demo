@@ -15,6 +15,12 @@ public class HelloAsyncSimple {
   private void sayHello(String helloTo) {
     final Scope scope = TracerHelper.traceLatency("sayHello", false);
 
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
     String helloStr = String.format("Hello, %s!", helloTo);
     scope.span().log(ImmutableMap.of("event", "string-format", "value", helloStr));
 

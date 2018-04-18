@@ -2,7 +2,6 @@ package com.aliyun.opentracingdemo.demo05;
 
 import com.aliyun.openservices.log.jaeger.sender.AliyunLogSender;
 import com.aliyun.openservices.log.jaeger.sender.util.TracerHelper;
-import com.aliyun.opentracingdemo.util.Tracing;
 import com.google.common.collect.ImmutableMap;
 
 import com.uber.jaeger.samplers.ConstSampler;
@@ -18,6 +17,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 public class Formatter extends Application<Configuration> {
 
@@ -27,12 +27,24 @@ public class Formatter extends Application<Configuration> {
 
     @GET
     public String format(@QueryParam("helloTo") String helloTo, @Context HttpHeaders httpHeaders) {
-      try (Scope scope = Tracing.startServerSpan(httpHeaders, "format")) {
-        String helloStr = String.format("Hello, %s!", helloTo);
-        scope.span().log(ImmutableMap.of("event", "string-format", "value", helloStr));
-        return helloStr;
+      MultivaluedMap<String, String> rawHeaders = httpHeaders.getRequestHeaders();
+      if (rawHeaders.get("trace-id") != null) {
+        String spanContextString = rawHeaders.get("trace-id").get(0);
+        try (Scope scope = TracerHelper.traceLatency("format", true, spanContextString)) {
+          return doFormat(helloTo, scope);
+        }
+      } else {
+        try (Scope scope = TracerHelper.traceLatency("format", true)) {
+          return doFormat(helloTo, scope);
+        }
       }
     }
+  }
+
+  private String doFormat(String helloTo, Scope scope) {
+    String helloStr = String.format("Hello, %s!", helloTo);
+    scope.span().log(ImmutableMap.of("event", "string-format", "value", helloStr));
+    return helloStr;
   }
 
   @Override
