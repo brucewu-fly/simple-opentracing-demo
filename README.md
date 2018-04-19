@@ -8,6 +8,7 @@
 ## 样例介绍
 下图展示了一个常见的分布式系统，这里有三个进程 `Hello`，`Formatter` 和 `Publisher`。`Hello` 中包含三个方法 `sayHello`，`formatString`，`printHello`。方法 `sayHello` 位于最外层，它会依次调用 `formatString` 和 `printHello`。`formatString` 会向 `Formatter` 发起一个远程方法调用。`printHello` 会向 `Publisher`  发起一个远程方法调用。
 
+![p1.png](/pics/p1.png)
 
 ## 埋点方法
 ```
