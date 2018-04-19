@@ -1,68 +1,60 @@
 # Simple OpenTracing Demo
 
-## 安装 & 配置
+## 背景
+现代应用逐渐从单体系统转变为微服务，如何在分布式环境下定位应用的性能瓶颈变得越来越复杂。为此，诞生了一批优秀的分布式追踪系统帮助我们解决上述问题。
 
-样例代码使用阿里云[日志服务](https://sls.console.aliyun.com)作为追踪数据的后端存储。当您通过日志服务控制台创建好 project，logstore 后便可通过如下方式运行样例。
+使用这些分布式追踪系统的第一步是在应用程序中埋点，本文将介绍绍如何使用 OpenTracing API 为您的应用程序埋点。由于 OpenTracing API 使用起来比较复杂，为此我们提供了一个 [TracerHelper](https://github.com/aliyun/aliyun-log-jaeger-sender/blob/master/src/main/java/com/aliyun/openservices/log/jaeger/sender/util/TracerHelper.java) 类，它对 OpenTracing API 进行了封装，能让您以更低的成本接入应用程序。
+
+## 样例介绍
+下图展示了一个常见的分布式系统，这里有三个进程 `Hello`，`Formatter` 和 `Publisher`。`Hello` 中包含三个方法 `sayHello`，`formatString`，`printHello`。方法 `sayHello` 位于最外层，它会依次调用 `formatString` 和 `printHello`。`formatString` 会向 `Formatter` 发起一个远程方法调用。`printHello` 会向 `Publisher`  发起一个远程方法调用。
+
+
+## 埋点方法
 ```
-git clone https://github.com/brucewu-fly/simple-opentracing-demo.git
-cd simple-opentracing-demo
-mvn clean compile
+// 为 sayHello 方法创建 rootSpan
+private void sayHello(String helloTo) {
+  try (Scope scope = TracerHelper.traceLatency("say-hello")) {
+	...
+  }
+}
 
-## 运行 demo01
-export PROJECT=<your_project> \
-ENDPOINT=<your_endpoint> \
-ACCESS_KEY_ID=<your_access_key_id> \
-ACCESS_KEY_SECRET=<your_access_key_secret> \
-LOG_STORE=<your_log_store> && \
-mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo01.Hello" -Dexec.args="world"
+// 为 formatString 方法创建 span
+private String formatString(String helloTo) {
+  try (Scope scope = TracerHelper.traceLatency("formatString")) {
+    ...
+  }
+}
 
-## 运行 demo02
-export PROJECT=<your_project> \
-ENDPOINT=<your_endpoint> \
-ACCESS_KEY_ID=<your_access_key_id> \
-ACCESS_KEY_SECRET=<your_access_key_secret> \
-LOG_STORE=<your_log_store> && \
-mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo02.HelloManual" -Dexec.args="world"
+// 为 printHello 方法创建 span
+private void printHello(String helloStr) {
+  try (Scope scope = TracerHelper.traceLatency("printHello")) {
+    ...
+  }
+}
 
-export PROJECT=<your_project> \
-ENDPOINT=<your_endpoint> \
-ACCESS_KEY_ID=<your_access_key_id> \
-ACCESS_KEY_SECRET=<your_access_key_secret> \
-LOG_STORE=<your_log_store> && \
-mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo02.HelloActive" -Dexec.args="world"
+// 客户端通过 TracerHelper.getActiveSpanContextString() 方法获取 spanContextString，
+// 然后将 spanContextString 作为网络协议里的字段发往服务端。此例将 spanContextString 放入了 HTTP Header 里。
+String spanContextString = TracerHelper.getActiveSpanContextString();
+requestBuilder.addHeader("trace-id", spanContextString);
 
-export PROJECT=<your_project> \
-ENDPOINT=<your_endpoint> \
-ACCESS_KEY_ID=<your_access_key_id> \
-ACCESS_KEY_SECRET=<your_access_key_secret> \
-LOG_STORE=<your_log_store> && \
-mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo02.HelloSimple" -Dexec.args="world"
+// 对于服务端程序 Formatter 和 Publisher，它们将 spanContextString 从网络协议的字段中提取出来，此例为 HTTP Header，
+// 然后通过 TracerHelper.traceLatency(String operationName, String spanContextString) 方法创建 scope
+String spanContextString = rawHeaders.get("trace-id").get(0);
+try (Scope scope = TracerHelper.traceLatency("format", spanContextString)) {
+  ...
+}
 
-## 运行 demo03
-export PROJECT=<your_project> \
-ENDPOINT=<your_endpoint> \
-ACCESS_KEY_ID=<your_access_key_id> \
-ACCESS_KEY_SECRET=<your_access_key_secret> \
-LOG_STORE=<your_log_store> && \
-mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo03.HelloException"
-
-## 运行 demo04
-export PROJECT=<your_project> \
-ENDPOINT=<your_endpoint> \
-ACCESS_KEY_ID=<your_access_key_id> \
-ACCESS_KEY_SECRET=<your_access_key_secret> \
-LOG_STORE=<your_log_store> && \
-mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo04.HelloAsync" -Dexec.args="world"
-
-export PROJECT=<your_project> \
-ENDPOINT=<your_endpoint> \
-ACCESS_KEY_ID=<your_access_key_id> \
-ACCESS_KEY_SECRET=<your_access_key_secret> \
-LOG_STORE=<your_log_store> && \
-mvn exec:java -Dexec.mainClass="com.aliyun.opentracingdemo.demo04.HelloAsyncSimple" -Dexec.args="world"
+String spanContextString = rawHeaders.get("trace-id").get(0);
+try (Scope scope = TracerHelper.traceLatency("publish", spanContextString)) {
+  ...
+}
 ```
+
 
 ## 样例
+
+这里提供了一系列额外的样例让您由浅入深了解 OpenTracing API 的使用方法。
+
 * [Demo 1 - Hello World](./src/main/java/com/aliyun/opentracingdemo/demo01)
   * 如何初始化一个 tracer
   * 如何创建一个简单的 trace
