@@ -11,6 +11,8 @@
 ![p1.png](/pics/p1.png)
 
 ## 埋点方法
+为了追踪分布式请求，我们需要对 `sayHello`，`formatString`，`printHello`，`format`，`publish` 等方法进行埋点，埋点方式如下。
+
 ```
 // 为 sayHello 方法创建 rootSpan
 private void sayHello(String helloTo) {
@@ -50,6 +52,17 @@ try (Scope scope = TracerHelper.traceLatency("publish", spanContextString)) {
   ...
 }
 ```
+
+埋点完成后会生成如下图所示的 tracing 结构。
+~~~
+––|–––––––|–––––––|–––––––|–––––––|–––––––|–––––––|–––––––|–> time
+
+ [sayHello ···············································]
+  [formatString ·············]
+    [format ···············]
+                              [printHello ···············]
+			       [publish ···············]
+~~~
 
 
 ## 样例
