@@ -53,7 +53,7 @@ try (Scope scope = TracerHelper.traceLatency("publish", spanContextString)) {
 }
 ```
 
-埋点完成后会生成如下图所示的 tracing 结构。
+埋点完成后会生成如下图所示的 trace 结构。
 ~~~
 ––|–––––––|–––––––|–––––––|–––––––|–––––––|–––––––|–––––––|–> time
 
