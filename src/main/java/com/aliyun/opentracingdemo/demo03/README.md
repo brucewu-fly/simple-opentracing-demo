@@ -111,3 +111,33 @@ private static void func6(boolean invokeException) {
   }
 }
 ```
+
+## 打印堆栈信息
+```
+private static void func7() {
+  try (Scope scope = TracerHelper.buildSpan("func7").startActive(true)) {
+    System.out.println("in func7");
+    try {
+      f1();
+    } catch (Throwable ex) {
+      TracerHelper.logThrowable(scope.span(), ex);
+    }
+  }
+}
+
+private static void f1() {
+  f2();
+}
+
+private static void f2() {
+  f3();
+}
+
+private static void f3() {
+  f4();
+}
+
+private static void f4() {
+  int a = 10 / 0;
+}
+```
