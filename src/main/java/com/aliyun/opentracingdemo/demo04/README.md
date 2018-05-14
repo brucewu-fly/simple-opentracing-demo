@@ -39,7 +39,7 @@ private void sayHello(String helloTo) {
 参阅 [HelloAsync.java](./HelloAsync.java)
 
 ## 方式二
-通过 TracerHelper 的 traceLatency() 方法和 asyncTraceLatency() 方法简化代码。
+通过 TracerHelper 的 asyncTraceLatency() 方法和 restoreAsyncTraceLatency() 方法简化代码。
 ```
 private void sayHello(String helloTo) {
   final Scope scope = TracerHelper.asyncTraceLatency("sayHello");
@@ -73,8 +73,8 @@ private void sayHello(String helloTo) {
 }
 ```
 说明
-1. 通过 `TracerHelper.traceLatency()` 开启一个 Span
+1. 通过 `TracerHelper.asyncTraceLatency()` 开启一个 Span
 2. 主线程不负责关闭 Scope 或 结束 Span
-3. 异步方法内通过 `TracerHelper.asyncTraceLatency()` 方法激活主线程的 Span，然后结束 Span
+3. 异步方法内通过 `TracerHelper.restoreAsyncTraceLatency()` 方法激活主线程的 Span，然后结束 Span
 
 参阅 [HelloAsyncSimple.java](./HelloAsyncSimple.java)
