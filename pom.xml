@@ -35,12 +35,6 @@
       <groupId>com.uber.jaeger</groupId>
       <artifactId>jaeger-core</artifactId>
       <version>${jaeger.core.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.thrift</groupId>
-          <artifactId>libthrift</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
