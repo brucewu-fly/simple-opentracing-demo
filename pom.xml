@@ -13,7 +13,8 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <opentracing.api.version>0.31.0</opentracing.api.version>
-    <aliyun.log.jaeger.sender.version>0.0.6</aliyun.log.jaeger.sender.version>
+    <jaeger.core.version>0.26.0</jaeger.core.version>
+    <aliyun.log.jaeger.sender.version>0.0.7</aliyun.log.jaeger.sender.version>
     <guava.version>23.0</guava.version>
     <logback.version>1.2.3</logback.version>
     <dropwizard.version>1.1.4</dropwizard.version>
@@ -29,6 +30,17 @@
       <groupId>com.aliyun.openservices</groupId>
       <artifactId>aliyun-log-jaeger-sender</artifactId>
       <version>${aliyun.log.jaeger.sender.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.uber.jaeger</groupId>
+      <artifactId>jaeger-core</artifactId>
+      <version>${jaeger.core.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.thrift</groupId>
+          <artifactId>libthrift</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>

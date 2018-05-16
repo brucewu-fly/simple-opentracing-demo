@@ -37,8 +37,11 @@ public class HelloSimple {
     String logStore = System.getenv("LOG_STORE");
     String endpoint = System.getenv("ENDPOINT");
     String accessKeyId = System.getenv("ACCESS_KEY_ID");
-    String accessKey = System.getenv("ACCESS_KEY_SECRET");
-    return new AliyunLogSender.Builder(projectName, logStore, endpoint, accessKeyId, accessKey)
+    String accessKeySecret = System.getenv("ACCESS_KEY_SECRET");
+    if (projectName == null || logStore == null || endpoint == null || accessKeyId == null || accessKeySecret == null) {
+      return null;
+    }
+    return new AliyunLogSender.Builder(projectName, logStore, endpoint, accessKeyId, accessKeySecret)
         .build();
   }
 
